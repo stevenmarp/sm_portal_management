@@ -15,7 +15,7 @@ class PortalDocument(CustomerPortal):
         if 'directory_count' in counters:
             Directory = request.env['sm.portal.directory']
             values['directory_count'] = Directory.search_count([]) \
-                if Directory.has_access('read') else 0
+                if Directory.check_access_rights('read', raise_exception=False) else 0
         return values
 
     # ------------------------------------------------------------------

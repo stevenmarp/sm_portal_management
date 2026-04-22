@@ -1,6 +1,6 @@
 {
     'name': 'Portal Documents Management',
-    'version': '19.0.1.0.0',
+    'version': '17.0.1.0.0',
     'category': 'Portal',
     'summary': 'Share documents and directories with portal users. '
                'Create directories, upload files, and manage access via followers.',
