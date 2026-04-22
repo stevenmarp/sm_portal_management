@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_portal_document_root"
+              name="Portal Documents"
+              web_icon="sm_portal_document,static/description/icon.png"
+              sequence="90"/>
+
+    <menuitem id="menu_portal_directory"
+              name="Directories"
+              parent="menu_portal_document_root"
+              action="portal_directory_action"
+              sequence="10"/>
+
+    <menuitem id="menu_portal_document"
+              name="Documents"
+              parent="menu_portal_document_root"
+              action="portal_document_action"
+              sequence="20"/>
+
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Directory Action ============ -->
+    <record id="portal_directory_action" model="ir.actions.act_window">
+        <field name="name">Directories</field>
+        <field name="res_model">sm.portal.directory</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first directory
+            </p>
+            <p>Organize documents in directories and share them with portal users.</p>
+        </field>
+    </record>
+
+    <!-- ============ Document Action ============ -->
+    <record id="portal_document_action" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">sm.portal.document</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Upload your first document
+            </p>
+            <p>Share documents with your portal users through directories.</p>
+        </field>
+    </record>
+
+</odoo>

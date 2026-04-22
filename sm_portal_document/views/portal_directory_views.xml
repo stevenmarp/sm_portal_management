@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Kanban View ============ -->
+    <record id="portal_directory_view_kanban" model="ir.ui.view">
+        <field name="name">sm.portal.directory.kanban</field>
+        <field name="model">sm.portal.directory</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fa fa-folder fa-2x text-warning"/>
+                            <div class="flex-grow-1 min-w-0">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted small">
+                                    <field name="child_count"/> sub-directories
+                                    · <field name="document_count"/> documents
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============ List View ============ -->
+    <record id="portal_directory_view_list" model="ir.ui.view">
+        <field name="name">sm.portal.directory.list</field>
+        <field name="model">sm.portal.directory</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="child_count"/>
+                <field name="document_count"/>
+                <field name="user_id"/>
+                <field name="allow_portal_upload" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============ Form View ============ -->
+    <record id="portal_directory_view_form" model="ir.ui.view">
+        <field name="name">sm.portal.directory.form</field>
+        <field name="model">sm.portal.directory</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(portal_document_action)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-file"
+                                context="{'default_directory_id': id, 'search_default_directory_id': id}">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                        <button name="%(portal_directory_action)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-folder"
+                                context="{'default_parent_id': id, 'search_default_parent_id': id}">
+                            <field name="child_count" widget="statinfo" string="Sub-Dirs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Directory Name"/>
+                        </h1>
+                        <field name="full_path" class="text-muted"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_id"/>
+                            <field name="icon"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="allow_portal_upload"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Description…"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============ Search View ============ -->
+    <record id="portal_directory_view_search" model="ir.ui.view">
+        <field name="name">sm.portal.directory.search</field>
+        <field name="model">sm.portal.directory</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="user_id"/>
+                <filter name="root_only" string="Root Directories"
+                        domain="[('parent_id', '=', False)]"/>
+                <group>
+                    <filter name="group_parent" string="Parent"
+                            context="{'group_by': 'parent_id'}"/>
+                    <filter name="group_owner" string="Owner"
+                            context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

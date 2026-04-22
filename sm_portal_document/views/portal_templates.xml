@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Portal Home Card                                             -->
+    <!-- ============================================================ -->
+    <template id="portal_my_home_documents"
+              name="Portal Documents"
+              customize_show="True"
+              inherit_id="portal.portal_my_home"
+              priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_service_category_enable" t-value="True"/>
+        </xpath>
+        <div id="portal_service_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/sm_portal_document/static/src/img/folder.svg'"/>
+                <t t-set="title">Documents</t>
+                <t t-set="text">Browse shared documents and directories</t>
+                <t t-set="url" t-value="'/my/directories'"/>
+                <t t-set="placeholder_count" t-value="'directory_count'"/>
+            </t>
+        </div>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Breadcrumbs                                                  -->
+    <!-- ============================================================ -->
+    <template id="portal_breadcrumbs_documents"
+              name="Portal Documents Breadcrumbs"
+              inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'directories'"
+                class="breadcrumb-item active">
+                Documents
+            </li>
+            <li t-if="page_name == 'directory_detail'"
+                class="breadcrumb-item">
+                <a href="/my/directories">Documents</a>
+            </li>
+            <li t-if="page_name == 'directory_detail' and directory"
+                class="breadcrumb-item active">
+                <t t-out="directory.name"/>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Directory List (/my/directories)                             -->
+    <!-- ============================================================ -->
+    <template id="portal_my_directories" name="My Directories">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Documents</t>
+            </t>
+
+            <!-- Search bar -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form method="GET" action="/my/directories" class="d-flex gap-2">
+                        <input type="hidden" name="sortby" t-att-value="sortby"/>
+                        <input type="text" name="search" class="form-control"
+                               placeholder="Search directories..."
+                               t-att-value="search"/>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search"/>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                    <!-- Create root directory - only for internal users or if configured -->
+                    <button class="btn btn-outline-primary" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#createDirForm">
+                        <i class="fa fa-plus"/> New Directory
+                    </button>
+                </div>
+            </div>
+
+            <!-- Create directory form (collapsible) -->
+            <div id="createDirForm" class="collapse mb-3">
+                <div class="card card-body">
+                    <form method="POST" action="/my/directories/create"
+                          class="d-flex gap-2 align-items-end">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="flex-grow-1">
+                            <label class="form-label">Directory Name</label>
+                            <input type="text" name="name" class="form-control"
+                                   placeholder="Enter directory name" required="required"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check"/> Create
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div t-if="not directories" class="alert alert-warning text-center" role="alert">
+                <i class="fa fa-folder-open-o fa-2x d-block mb-2"/>
+                There are no directories available for your account.
+            </div>
+
+            <!-- Directory grid (card-based like portal_document) -->
+            <div t-if="directories" class="row g-3">
+                <t t-foreach="directories" t-as="dir">
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <a t-attf-href="/my/directories/#{dir.id}"
+                           class="text-decoration-none">
+                            <div class="card h-100 shadow-sm border-0 bg-100 portal-dir-card">
+                                <div class="card-body text-center py-4">
+                                    <i class="fa fa-folder fa-3x text-warning mb-3 d-block"/>
+                                    <h6 class="card-title mb-1 text-truncate" t-out="dir.name"/>
+                                    <div class="text-muted small">
+                                        <span t-out="dir.child_count"/> dirs
+                                        · <span t-out="dir.document_count"/> files
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </t>
+            </div>
+
+            <!-- Pager -->
+            <div t-if="pager" class="o_portal_pager d-flex justify-content-center my-3">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Directory Detail (/my/directories/<id>)                      -->
+    <!-- ============================================================ -->
+    <template id="portal_directory_detail" name="Directory Detail">
+        <t t-call="portal.portal_layout">
+
+            <!-- Action buttons row -->
+            <div t-if="directory.allow_portal_upload"
+                 class="d-flex gap-2 flex-wrap mb-3">
+                <button class="btn btn-outline-primary btn-sm" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#createSubDirForm">
+                    <i class="fa fa-folder-plus"/> New Sub-Directory
+                </button>
+                <button class="btn btn-outline-success btn-sm" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#uploadDocForm">
+                    <i class="fa fa-upload"/> Upload Document
+                </button>
+            </div>
+
+            <!-- Create sub-directory form (collapsible) -->
+            <div id="createSubDirForm" class="collapse mb-3">
+                <div class="card card-body">
+                    <form method="POST"
+                          t-attf-action="/my/directories/#{directory.id}/create"
+                          class="d-flex gap-2 align-items-end">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="flex-grow-1">
+                            <label class="form-label">Sub-Directory Name</label>
+                            <input type="text" name="name" class="form-control"
+                                   placeholder="Enter name" required="required"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check"/> Create
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Upload document form (collapsible) -->
+            <div id="uploadDocForm" class="collapse mb-3">
+                <div class="card card-body">
+                    <form method="POST"
+                          t-attf-action="/my/directories/#{directory.id}/upload"
+                          enctype="multipart/form-data"
+                          class="d-flex gap-2 align-items-end">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="flex-grow-1">
+                            <label class="form-label">Choose File</label>
+                            <input type="file" name="file" class="form-control"
+                                   required="required"/>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-upload"/> Upload
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sub-directories -->
+            <t t-if="child_dirs">
+                <h5 class="mb-3">
+                    <i class="fa fa-folder text-warning"/> Sub-Directories
+                    <span class="badge text-bg-secondary" t-out="len(child_dirs)"/>
+                </h5>
+                <div class="row g-3 mb-4">
+                    <t t-foreach="child_dirs" t-as="cdir">
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <a t-attf-href="/my/directories/#{cdir.id}"
+                               class="text-decoration-none">
+                                <div class="card h-100 shadow-sm border-0 bg-100 portal-dir-card">
+                                    <div class="card-body text-center py-3">
+                                        <i class="fa fa-folder fa-2x text-warning mb-2 d-block"/>
+                                        <h6 class="card-title mb-0 text-truncate"
+                                            t-out="cdir.name"/>
+                                        <div class="text-muted small">
+                                            <span t-out="cdir.child_count"/> dirs
+                                            · <span t-out="cdir.document_count"/> files
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </t>
+                </div>
+            </t>
+
+            <!-- Documents -->
+            <t t-if="documents">
+                <h5 class="mb-3">
+                    <i class="fa fa-file text-primary"/> Documents
+                    <span class="badge text-bg-secondary" t-out="len(documents)"/>
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th/>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Uploaded By</th>
+                                <th>Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="documents" t-as="doc">
+                                <tr>
+                                    <td class="text-center" style="width: 40px;">
+                                        <i t-attf-class="fa #{doc._get_file_icon()} fa-lg"/>
+                                    </td>
+                                    <td>
+                                        <span t-out="doc.name"/>
+                                        <div t-if="doc.filename" class="text-muted small">
+                                            <t t-out="doc.filename"/>
+                                        </div>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <t t-if="doc.file_size &lt; 1024">
+                                            <span t-out="'%.1f' % doc.file_size"/> KB
+                                        </t>
+                                        <t t-else="">
+                                            <span t-out="'%.1f' % (doc.file_size / 1024)"/> MB
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <span t-out="doc.user_id.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.create_date"
+                                              t-options="{'widget': 'date'}"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <a t-attf-href="/my/documents/#{doc.id}/download"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Download">
+                                            <i class="fa fa-download"/>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+
+            <!-- Empty state: no sub-dirs and no documents -->
+            <div t-if="not child_dirs and not documents"
+                 class="alert alert-info text-center" role="alert">
+                <i class="fa fa-folder-open-o fa-2x d-block mb-2"/>
+                This directory is empty.
+                <t t-if="directory.allow_portal_upload">
+                    Use the buttons above to add content.
+                </t>
+            </div>
+
+        </t>
+    </template>
+
+</odoo>

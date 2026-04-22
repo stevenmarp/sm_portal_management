@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Record Rules ============ -->
+
+    <!-- Portal: Only see directories where user is a follower -->
+    <record id="directory_rule_portal" model="ir.rule">
+        <field name="name">Portal: Follower Directories</field>
+        <field name="model_id" ref="model_sm_portal_directory"/>
+        <field name="domain_force">[('message_partner_ids', 'in', [user.partner_id.id])]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Portal: Only see documents in directories where user is a follower -->
+    <record id="document_rule_portal" model="ir.rule">
+        <field name="name">Portal: Follower Documents</field>
+        <field name="model_id" ref="model_sm_portal_document"/>
+        <field name="domain_force">[('directory_id.message_partner_ids', 'in', [user.partner_id.id])]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Internal users: Full access -->
+    <record id="directory_rule_internal" model="ir.rule">
+        <field name="name">Internal: All Directories</field>
+        <field name="model_id" ref="model_sm_portal_directory"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="document_rule_internal" model="ir.rule">
+        <field name="name">Internal: All Documents</field>
+        <field name="model_id" ref="model_sm_portal_document"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+</odoo>

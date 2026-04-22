@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sm_portal_directory_admin,sm.portal.directory.admin,model_sm_portal_directory,base.group_system,1,1,1,1
+access_sm_portal_directory_user,sm.portal.directory.user,model_sm_portal_directory,base.group_user,1,1,1,1
+access_sm_portal_directory_portal,sm.portal.directory.portal,model_sm_portal_directory,base.group_portal,1,1,1,0
+access_sm_portal_document_admin,sm.portal.document.admin,model_sm_portal_document,base.group_system,1,1,1,1
+access_sm_portal_document_user,sm.portal.document.user,model_sm_portal_document,base.group_user,1,1,1,1
+access_sm_portal_document_portal,sm.portal.document.portal,model_sm_portal_document,base.group_portal,1,1,1,0

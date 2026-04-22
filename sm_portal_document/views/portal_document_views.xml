@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Kanban View ============ -->
+    <record id="portal_document_view_kanban" model="ir.ui.view">
+        <field name="name">sm.portal.document.kanban</field>
+        <field name="model">sm.portal.document</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fa fa-file-o fa-2x text-primary"/>
+                            <div class="flex-grow-1 min-w-0">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted small">
+                                    <field name="filename"/> ·
+                                    <field name="file_size"/> KB
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============ List View ============ -->
+    <record id="portal_document_view_list" model="ir.ui.view">
+        <field name="name">sm.portal.document.list</field>
+        <field name="model">sm.portal.document</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="directory_id"/>
+                <field name="filename"/>
+                <field name="file_size"/>
+                <field name="mimetype"/>
+                <field name="user_id"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============ Form View ============ -->
+    <record id="portal_document_view_form" model="ir.ui.view">
+        <field name="name">sm.portal.document.form</field>
+        <field name="model">sm.portal.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Document Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="directory_id"/>
+                            <field name="file" filename="filename"/>
+                            <field name="filename" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="file_size"/>
+                            <field name="mimetype"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Description…"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============ Search View ============ -->
+    <record id="portal_document_view_search" model="ir.ui.view">
+        <field name="name">sm.portal.document.search</field>
+        <field name="model">sm.portal.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="directory_id"/>
+                <field name="filename"/>
+                <field name="user_id"/>
+                <group>
+                    <filter name="group_directory" string="Directory"
+                            context="{'group_by': 'directory_id'}"/>
+                    <filter name="group_uploader" string="Uploaded By"
+                            context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>
